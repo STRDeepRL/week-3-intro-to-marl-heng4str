@@ -75,7 +75,7 @@ def test_evaluation():
 
     for checkpoint_path in checkpoint_paths:
         # Define parameters for the test
-        env = str(checkpoint_path).split("/")[-2].split("_")[1]
+        env = str(checkpoint_path).split("/")[-2].split("_")[1] + "-Eval"
         scenario_name = env.split("-v3-")[1]
         gif = f"{scenario_name}_{SUBMITTER_NAME}"
 
@@ -89,7 +89,7 @@ def test_evaluation():
         elif "CTDE-Red" in scenario_name:
             policies_to_eval = ["red_0", "red_1"]
             evaluation_config["team_policies_mapping"] = {
-                    "red": "your_policy_name",
+                    "red_0": "your_policy_name",
                     "red_1": "your_policy_name_v2",
                 }
 
