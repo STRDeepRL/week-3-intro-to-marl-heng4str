@@ -1,6 +1,7 @@
 {
     "team_policies_mapping": {
-        "red_0": "your_policy_name"
+        "red_0": "your_policy_name",
+        "red_1": "your_policy_name_v2"
     },
     "using_eval_scenarios" : false,
 

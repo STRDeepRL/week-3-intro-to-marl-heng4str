@@ -28,6 +28,17 @@ SUBMITTER_NAME = submission_config["name"]
 SAVE_DIR = "submission/evaluation_reports/from_github_actions"
 
 
+EVALUATION_CONFIG_FILE = sorted(
+    Path("submission").expanduser().glob("**/configs/evaluation_config.json"), key=os.path.getmtime
+)[-1]
+
+with open(EVALUATION_CONFIG_FILE, "r") as file:
+   evaluation_config_data = file.read()
+
+evaluation_config = json.loads(evaluation_config_data)
+
+
+
 def commit_and_push():
     # Setting git config
     # subprocess.run(['git', 'config', '--global', 'user.email', 'you@example.com'])
@@ -71,8 +82,16 @@ def test_evaluation():
         policies_to_eval = ["red_0"]
         if "2v2" in scenario_name:
             policies_to_eval = ["red"]
+            evaluation_config["team_policies_mapping"] = {
+                                "red": "your_policy_name",
+                            }
+
         elif "CTDE-Red" in scenario_name:
             policies_to_eval = ["red_0", "red_1"]
+            evaluation_config["team_policies_mapping"] = {
+                    "red": "your_policy_name",
+                    "red_1": "your_policy_name_v2",
+                }
 
         # Set argument
         params = {
@@ -88,6 +107,7 @@ def test_evaluation():
             "render_mode": "rgb_array",
             "save_dir": SAVE_DIR,
             "policies_to_eval": policies_to_eval,
+            "eval_config" : evaluation_config,
         }
 
         args = argparse.Namespace(**params)
@@ -103,3 +123,6 @@ def test_evaluation():
 
 
 # cProfile.run('test_evaluation()', 'test_evaluation_output.prof')
+
+
+test_evaluation()

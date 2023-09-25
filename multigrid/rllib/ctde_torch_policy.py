@@ -32,7 +32,7 @@ class CentralizedValueMixin:
         # HW3 TODO: Fill in the blank to assign the central_value_function from the model to compute_central_vf.
         # This step is crucial for CTCE as it allows for the computation of the value function using
         # global state and action, leading to more informed and coordinated policy updates.
-        self.compute_central_vf = ______
+        self.compute_central_vf = self.model.central_value_function
 
 
 # Grabs the global team obs/act and includes it in the experience train_batch,
@@ -82,7 +82,7 @@ def centralized_critic_postprocessing(policy, sample_batch, other_agent_batches=
         # that considers the observations and actions of all agents, leading to a more global
         # and coordinated policy.
         sample_batch[SampleBatch.VF_PREDS] = (
-            ___________________(
+            policy.compute_central_vf(
                 convert_to_torch_tensor(sample_batch[SampleBatch.CUR_OBS], policy.device),
                 convert_to_torch_tensor(sample_batch[GLOBAL_TEAM_OBS], policy.device),
                 convert_to_torch_tensor(sample_batch[GLOBAL_TEAM_ACTION], policy.device),
@@ -152,7 +152,7 @@ def loss_with_central_critic(policy, base_policy, model, dist_class, train_batch
     # which takes into account the global state and actions, leading to more coordinated and effective learning
     # across different agents in the environment.
     # Fill in the blank to assign the custom value function to policy.model.central_value_function
-    model.value_function = lambda: ______(
+    model.value_function = lambda: policy.model.central_value_function(
         train_batch[SampleBatch.CUR_OBS],
         train_batch[GLOBAL_TEAM_OBS],
         train_batch[GLOBAL_TEAM_ACTION],
