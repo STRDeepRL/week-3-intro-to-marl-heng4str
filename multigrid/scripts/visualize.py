@@ -111,7 +111,7 @@ def save_evaluation_metrics(episodes_data: List[Dict], save_path: Path, scenario
 
 def get_actions(
     agent_ids: Iterable[AgentID],
-    algorithm: Algorithm,
+    our_algorithm: Algorithm, opponent_algorithm: Algorithm,
     observations: dict[AgentID, Any],
     states: dict[AgentID, Any]) -> tuple[dict[AgentID, Any], dict[AgentID, Any]]:
     """
@@ -140,21 +140,31 @@ def get_actions(
     actions = {}
     for agent_id in agent_ids:
         if states[agent_id]:
-            actions[agent_id], states[agent_id], _ = algorithm.compute_single_action(
+            actions[agent_id], states[agent_id], _ = our_algorithm.compute_single_action(
                 observations[agent_id],
                 states[agent_id],
                 policy_id=agent_id
             )
         else:
-            actions[agent_id] = algorithm.compute_single_action(
-                observations[agent_id],
-                policy_id=agent_id
-            )
+
+            if agent_id == "red_0":
+                actions[agent_id] = our_algorithm.compute_single_action(
+                    observations[agent_id],
+                    policy_id=agent_id
+                )
+            else:
+                actions[agent_id] = opponent_algorithm.compute_single_action(
+                    observations[agent_id],
+                    policy_id="red_0"
+                )
+
+
+
 
     return actions, states
 
 def evaluation(
-    algorithm: Algorithm, num_episodes: int = 100, policies_to_eval: list[str] = ["red_0"]
+    our_algorithm: Algorithm, opponent_algorithm: Algorithm, num_episodes: int = 100, policies_to_eval: list[str] = ["red_0"]
 ) -> list[np.ndarray]:
     """
     Visualizes trajectories from trained agents and collects evaluation data.
@@ -176,7 +186,7 @@ def evaluation(
 
     frames = []
     episodes_data = []
-    env = algorithm.env_creator(algorithm.config.env_config)
+    env = our_algorithm.env_creator(our_algorithm.config.env_config)
 
     for episode in range(num_episodes):
         print("\n", "-" * 32, "\n", "Episode", episode, "\n", "-" * 32)
@@ -184,7 +194,7 @@ def evaluation(
         episode_rewards = {agent_id: 0.0 for agent_id in env.get_agent_ids()}
         terminations, truncations = {"__all__": False}, {"__all__": False}
         observations, infos = env.reset()
-        states = {agent_id: algorithm.get_policy(agent_id).get_initial_state() for agent_id in env.get_agent_ids()}
+        states = {agent_id: our_algorithm.get_policy(agent_id).get_initial_state() for agent_id in env.get_agent_ids()}
 
         step_count = 0
         while not terminations["__all__"] and not truncations["__all__"]:
@@ -192,7 +202,7 @@ def evaluation(
 
 
             actions, states = get_actions(
-                env.get_agent_ids(), algorithm, observations, states)
+                env.get_agent_ids(), our_algorithm, opponent_algorithm , observations, states)
 
 
             # for agent_id in env.get_agent_ids():
@@ -269,7 +279,8 @@ def main_evaluation(args):
     config.environment(disable_env_checking=True)
     # config.rl_module( _enable_rl_module_api=False)
     # config.training(_enable_learner_api=False)
-    algorithm = config.build()
+    our_algorithm = config.build()
+    opponent_algorithm = config.build()
     checkpoint = get_checkpoint_dir(args.load_dir)
 
     # Create a Path object for the directory
@@ -282,30 +293,38 @@ def main_evaluation(args):
         from ray.rllib.policy.policy import Policy
         print(f"Loading checkpoint from {checkpoint}")
  
+        # if "default_DTDE_1v1_opponent_checkpoint" in args.eval_config and "DTDE-1v1" in args.env:
+        #     restored_policies = Policy.from_checkpoint(args.eval_config["default_DTDE_1v1_opponent_checkpoint"])
+        # elif "default_CTCE_2v2_opponent_checkpoint" in args.eval_config and "CTCE-2v2" in args.env:
+        #     restored_policies = Policy.from_checkpoint(args.eval_config["default_CTCE_2v2_opponent_checkpoint"])
+        # else:
+        #     restored_policies = Policy.from_checkpoint(checkpoint)
+        
+        # sorted_keys = sorted(restored_policies.keys(), key=sort_policy_id, reverse=True)
+        # opponent_policies=[policy for policy in algorithm.config.policies if policy not in args.policies_to_eval]
+
+        # for idx, agent_id in enumerate(opponent_policies):
+        #     best_opponent_policy_id = sorted_keys[:len(opponent_policies)][idx]
+        #     restored_policy_weights = restored_policies[best_opponent_policy_id].get_weights()
+        #     algorithm.set_weights({agent_id: restored_policy_weights})
+
+        # for agent_id in args.policies_to_eval :
+        #     restored_policy_weights = Policy.from_checkpoint(checkpoint)[agent_id].get_weights()
+        #     algorithm.set_weights({agent_id: restored_policy_weights})
+
         if "default_DTDE_1v1_opponent_checkpoint" in args.eval_config and "DTDE-1v1" in args.env:
             restored_policies = Policy.from_checkpoint(args.eval_config["default_DTDE_1v1_opponent_checkpoint"])
+            opponent_algorithm.restore(args.eval_config["default_DTDE_1v1_opponent_checkpoint"])
         elif "default_CTCE_2v2_opponent_checkpoint" in args.eval_config and "CTCE-2v2" in args.env:
             restored_policies = Policy.from_checkpoint(args.eval_config["default_CTCE_2v2_opponent_checkpoint"])
         else:
             restored_policies = Policy.from_checkpoint(checkpoint)
         
-        sorted_keys = sorted(restored_policies.keys(), key=sort_policy_id, reverse=True)
-        opponent_policies=[policy for policy in algorithm.config.policies if policy not in args.policies_to_eval]
 
-        for idx, agent_id in enumerate(opponent_policies):
-            best_opponent_policy_id = sorted_keys[:len(opponent_policies)][idx]
-            restored_policy_weights = restored_policies[best_opponent_policy_id].get_weights()
-            algorithm.set_weights({agent_id: restored_policy_weights})
-
-        for agent_id in args.policies_to_eval :
-            restored_policy_weights = Policy.from_checkpoint(checkpoint)[agent_id].get_weights()
-            algorithm.set_weights({agent_id: restored_policy_weights})
-
-
-        # algorithm.restore(checkpoint)
+        our_algorithm.restore(checkpoint)
        
     frames, episodes_data = evaluation(
-        algorithm, num_episodes=args.num_episodes, policies_to_eval=args.policies_to_eval
+        our_algorithm, opponent_algorithm, num_episodes=args.num_episodes, policies_to_eval=args.policies_to_eval
     )
 
     scenario_name = args.env.split("-v3-")[1] #str(checkpoint).split("/")[-2].split("_")[1].split("-v3-")[1]

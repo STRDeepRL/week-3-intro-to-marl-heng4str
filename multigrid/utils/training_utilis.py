@@ -206,7 +206,6 @@ def algorithm_config(
     algorithm_training_config = {}
 
     # HW3 NOTE - Update Reward Scheme
-
     if policies_map:
         for policy_id, this_policy in policies_map.items():
             env_config["reward_schemes"][policy_id] = this_policy.reward_schemes[policy_id]
