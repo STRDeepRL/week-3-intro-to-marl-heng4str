@@ -471,7 +471,7 @@ CONFIGURATIONS = {
                 },
             },
             "randomization": True,
-            "max_steps": 300,
+            "max_steps": 500,
         },
     ),
     "MultiGrid-CompetativeRedBlueDoor-v3-DTDE-2v2": (
