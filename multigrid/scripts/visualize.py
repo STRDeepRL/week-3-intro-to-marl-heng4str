@@ -324,7 +324,7 @@ def main_evaluation(args):
         evaluating_algorithms, num_episodes=args.num_episodes, policies_to_eval=args.policies_to_eval
     )
 
-    scenario_name = args.env.split("-v3-")[1] #str(checkpoint).split("/")[-2].split("_")[1].split("-v3-")[1]
+    scenario_name = args.gif # args.env.split("-v3-")[1] 
     save_evaluation_metrics(episodes_data=episodes_data, save_path=save_path, scenario_name=scenario_name)
 
     if args.gif:

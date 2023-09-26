@@ -157,19 +157,12 @@ def test_batch_evaluation():
         agent_policies_checkpoints[custom_policy_id] = checkpoint_path
 
         
-
-
-
-
     # Now, matchups contains all the 1v1 competitions
     for match in matchups:
         policy1, policy2 = match
 
         checkpoint_path_1 = agent_policies_checkpoints[policy1]
         checkpoint_path_2 = agent_policies_checkpoints[policy2]
-
-        # restored_policies_1 = Policy.from_checkpoint(checkpoint_path_1)
-        # restored_policies_2 = Policy.from_checkpoint(checkpoint_path_2)
 
         # Define parameters for the test
         env = "MultiGrid-CompetativeRedBlueDoor-v3-DTDE-1v1"
@@ -184,6 +177,7 @@ def test_batch_evaluation():
 
             gif = f"{scenario_name}_{policy1}_as_Red_VS_{policy2}_as_Blue"
 
+            evaluation_config["team_policies_mapping"] = {}
             evaluation_config["team_policies_mapping"]["red_0"] = policy1
             evaluation_config["team_policies_mapping"]["blue_0"] = policy2
             evaluation_config["default_DTDE_1v1_opponent_checkpoint"] = checkpoint_path_2
@@ -214,7 +208,6 @@ def test_batch_evaluation():
             # Check the generated evaluation reports
             eval_report_path = os.path.join(args.save_dir, f"{gif}_eval_summary.csv")
             # assert os.path.exists(eval_report_path), f"Expected evaluation report {eval_report_path} doesn't exist!"
-
 
             # Change Red-Blue aysimatry
             policy1, policy2 = policy2, policy1
