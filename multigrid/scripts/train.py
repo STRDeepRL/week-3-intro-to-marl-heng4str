@@ -165,6 +165,7 @@ def train(
             SelfPlayCallback(
                 policy_to_train=config.policies_to_train[0],
                 opponent_policy=[policy for policy in config.policies if policy != config.policies_to_train[0]][0],
+                win_rate_threshold=win_rate_threshold,
             )
         )
         policy_reward_means = {
@@ -193,7 +194,7 @@ def train(
             )
         )
 
-        results = tune.Tuner(
+        result = tune.Tuner(
             "PPO",
             param_space=config,
             run_config=air.RunConfig(
@@ -205,7 +206,7 @@ def train(
                     checkpoint_frequency=10,
                 ),
                 storage_path=save_dir,
-                # callbacks=callbacks, # future fix
+                callbacks=callbacks, # future fix
                 name=experiment_name,
             ),
         ).fit()
@@ -249,7 +250,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--env",
         type=str,
-        default="MultiGrid-CompetativeRedBlueDoor-v3-CTDE-Red",
+        default="MultiGrid-CompetativeRedBlueDoor-v3-DTDE-1v1",
         help="MultiGrid environment to use.",  #  MultiGrid-CompetativeRedBlueDoor-v3-DTDE-1v1
     )
     parser.add_argument(
@@ -268,21 +269,21 @@ if __name__ == "__main__":
     parser.add_argument(
         "--seed", type=int, default=0, help="Set the random seed of each worker. This makes experiments reproducible"
     )
-    parser.add_argument("--num-workers", type=int, default=10, help="Number of rollout workers.")
+    parser.add_argument("--num-workers", type=int, default=12, help="Number of rollout workers.")
     parser.add_argument("--num-gpus", type=int, default=0, help="Number of GPUs to train on.")
     parser.add_argument("--num-timesteps", type=int, default=1e6, help="Total number of timesteps to train.")
     parser.add_argument("--lr", type=float, help="Learning rate for training.")
     parser.add_argument(
         "--load-dir",
         type=str,
-        default=None,
+        default="/Users/zla0368/Documents/RL/RL_Class/code/test_hw/week-3-intro-to-marl-heng4str/submission/ray_results/Self_Play_Testing/PPO_MultiGrid-CompetativeRedBlueDoor-v3-DTDE-1v1_e872e_00000_0_2023-09-25_17-17-18/checkpoint_000220",
         help="Checkpoint directory for loading pre-trained policies.",
     )
     parser.add_argument("--policies-to-load", nargs="+", type=str, default=None, help="List of agent ids to train")
     parser.add_argument(
         "--restore-all-policies-from-checkpoint",
         type=bool,
-        default=False,
+        default=True,
         help="If we want to continue training from last checkpoint",
     )
     parser.add_argument(
@@ -294,16 +295,16 @@ if __name__ == "__main__":
     parser.add_argument(
         "--name",
         type=str,
-        default="CTDE_Testing",
+        default="Self_Play_Testing",
         help="Distinct name to track your experinemnt in save-dir",  # <my_experinemnt>
     )
     parser.add_argument(
         "--local-mode", type=bool, default=False, help="Boolean value to set to use local mode for debugging"
     )
     parser.add_argument(
-        "--training-scheme", type=str, default="CTDE", help="Can be either 'CTCE', 'DTDE' or 'CTDE', for both "
+        "--training-scheme", type=str, default="DTDE", help="Can be either 'CTCE', 'DTDE' or 'CTDE', for both "
     )
-    parser.add_argument("--using-self-play", type=bool, default=False, help="If we want to train with Policy Self-Play")
+    parser.add_argument("--using-self-play", type=bool, default=True, help="If we want to train with Policy Self-Play")
     parser.add_argument(
         "--win-rate-threshold",
         type=float,

@@ -354,8 +354,8 @@ CONFIGURATIONS = {
                     "invalid_pickup_dense_penalty": 0.001,
                 },
             },
-            "randomization": True,
-            "max_steps": 100,
+            "randomization": False,
+            "max_steps": 800,
         },
     ),
     "MultiGrid-CompetativeRedBlueDoor-v3-CTCE-1v1": (
@@ -699,10 +699,7 @@ CONFIGURATIONS = {
 }
 
 # Register environments with gymnasium
-from gymnasium.envs.registration import register
 from ray.tune.registry import register_env
 
 for name, (env_cls, config) in CONFIGURATIONS.items():
     register_env(name, lambda config: env_cls(config))
-
-    # register(id=name, entry_point=env_cls, kwargs=config)

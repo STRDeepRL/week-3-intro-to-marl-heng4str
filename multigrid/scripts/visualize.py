@@ -240,7 +240,7 @@ def main_evaluation(args):
             algorithm.set_weights({agent_id: restored_policy_weights})
 
         for agent_id in args.policies_to_eval :
-            restored_policy_weights = restored_policies[agent_id].get_weights()
+            restored_policy_weights = Policy.from_checkpoint(checkpoint)[agent_id].get_weights()
             algorithm.set_weights({agent_id: restored_policy_weights})
 
 
