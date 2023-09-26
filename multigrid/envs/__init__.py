@@ -355,7 +355,7 @@ CONFIGURATIONS = {
                 },
             },
             "randomization": False,
-            "max_steps": 800,
+            "max_steps": 300,
         },
     ),
     "MultiGrid-CompetativeRedBlueDoor-v3-CTCE-1v1": (

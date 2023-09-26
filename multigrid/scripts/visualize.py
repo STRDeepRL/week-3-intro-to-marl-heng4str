@@ -22,6 +22,12 @@ import subprocess
 import git
 import os
 
+from ray.rllib.algorithms import Algorithm
+from ray.rllib.utils.typing import AgentID
+from typing import Any, Callable, Iterable
+
+
+
 # Set the working diretory to the repo root
 REPO_ROOT = subprocess.check_output(["git", "rev-parse", "--show-toplevel"]).strip().decode("utf-8")
 os.chdir(REPO_ROOT)
@@ -103,6 +109,50 @@ def save_evaluation_metrics(episodes_data: List[Dict], save_path: Path, scenario
     print(f"Metrics saved to {save_path}")
 
 
+def get_actions(
+    agent_ids: Iterable[AgentID],
+    algorithm: Algorithm,
+    observations: dict[AgentID, Any],
+    states: dict[AgentID, Any]) -> tuple[dict[AgentID, Any], dict[AgentID, Any]]:
+    """
+    Get actions for the given agents.
+
+    Parameters
+    ----------
+    agent_ids : Iterable[AgentID]
+        Agent IDs for which to get actions
+    algorithm : Algorithm
+        RLlib algorithm instance with trained policies
+    policy_mapping_fn : Callable(AgentID) -> str
+        Function mapping agent IDs to policy IDs
+    observations : dict[AgentID, Any]
+        Observations for each agent
+    states : dict[AgentID, Any]
+        States for each agent
+
+    Returns
+    -------
+    actions : dict[AgentID, Any]
+        Actions for each agent
+    states : dict[AgentID, Any]
+        Updated states for each agent
+    """
+    actions = {}
+    for agent_id in agent_ids:
+        if states[agent_id]:
+            actions[agent_id], states[agent_id], _ = algorithm.compute_single_action(
+                observations[agent_id],
+                states[agent_id],
+                policy_id=agent_id
+            )
+        else:
+            actions[agent_id] = algorithm.compute_single_action(
+                observations[agent_id],
+                policy_id=agent_id
+            )
+
+    return actions, states
+
 def evaluation(
     algorithm: Algorithm, num_episodes: int = 100, policies_to_eval: list[str] = ["red_0"]
 ) -> list[np.ndarray]:
@@ -135,19 +185,27 @@ def evaluation(
         terminations, truncations = {"__all__": False}, {"__all__": False}
         observations, infos = env.reset()
         states = {agent_id: algorithm.get_policy(agent_id).get_initial_state() for agent_id in env.get_agent_ids()}
+
+        step_count = 0
         while not terminations["__all__"] and not truncations["__all__"]:
             frames.append(env.get_frame())
 
-            actions = {}
-            for agent_id in env.get_agent_ids():
-                # Single-agent
-                actions[agent_id] = algorithm.compute_single_action(
-                    observations[agent_id], states[agent_id], policy_id=agent_id
-                )
+
+            actions, states = get_actions(
+                env.get_agent_ids(), algorithm, observations, states)
+
+
+            # for agent_id in env.get_agent_ids():
+            #     # Single-agent
+            #     actions[agent_id] = algorithm.compute_single_action(
+            #         observations[agent_id], states[agent_id], policy_id=agent_id
+            #     )
 
             observations, rewards, terminations, truncations, infos = env.step(actions)
             for agent_id in rewards:
                 episode_rewards[agent_id] += rewards[agent_id]
+
+            step_count+=1
 
         frames.append(env.get_frame())
         opponents = [agent for agent in env.env.env.agents if agent.name not in policies_to_eval]

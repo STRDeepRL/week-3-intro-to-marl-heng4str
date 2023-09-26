@@ -199,7 +199,7 @@ def algorithm_config(
     # env_creator = _global_registry.get(ENV_CREATOR, env)
     # env_config = registry_get_input(name=env)
     # env_config = gym_envs_registry[env].kwargs
-    _, env_config = CONFIGURATIONS[env]
+    env_config = CONFIGURATIONS[env][1] | env_config
 
     env_config["policies_map"] = {}
     env_config["team_policies_mapping"] = team_policies_mapping
