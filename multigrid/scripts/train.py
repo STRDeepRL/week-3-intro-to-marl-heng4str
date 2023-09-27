@@ -250,7 +250,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--env",
         type=str,
-        default="MultiGrid-CompetativeRedBlueDoor-v3-DTDE-1v1",
+        default="MultiGrid-CompetativeRedBlueDoor-v3-DTDE-1v1-Death_Match",
         help="MultiGrid environment to use.",  #  MultiGrid-CompetativeRedBlueDoor-v3-DTDE-1v1
     )
     parser.add_argument(

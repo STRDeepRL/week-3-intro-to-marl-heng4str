@@ -129,7 +129,7 @@ def test_evaluation():
 
 def test_batch_evaluation():
     # Create/check paths
-    search_dir = "submission/ray_results/1v1"
+    search_dir = "submission/ray_results/temp_1v1"
     assert os.path.exists(search_dir), f"Directory {search_dir} does not exist!"
 
     checkpoint_dirs = [
@@ -172,7 +172,7 @@ def test_batch_evaluation():
         # restored_policies_2 = Policy.from_checkpoint(checkpoint_path_2)
 
         # Define parameters for the test
-        env = "MultiGrid-CompetativeRedBlueDoor-v3-DTDE-1v1"
+        env = "MultiGrid-CompetativeRedBlueDoor-v3-DTDE-1v1-Death_Match"
 
         if evaluation_config["using_eval_scenarios"]:
             env += "-Eval" 
@@ -184,6 +184,7 @@ def test_batch_evaluation():
 
             gif = f"{scenario_name}_{policy1}_as_Red_VS_{policy2}_as_Blue"
 
+            evaluation_config["team_policies_mapping"] = {}
             evaluation_config["team_policies_mapping"]["red_0"] = policy1
             evaluation_config["team_policies_mapping"]["blue_0"] = policy2
             evaluation_config["default_DTDE_1v1_opponent_checkpoint"] = checkpoint_path_2

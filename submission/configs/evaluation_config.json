@@ -1,12 +1,12 @@
 {
     "team_policies_mapping": {
         "red_0": "your_policy_name_v2",
-        "blue_0": "your_policy_name"
+        "blue_0": "your_policy_name_v2"
 
     },
     "using_eval_scenarios" : true,
 
-    "default_DTDE_1v1_opponent_checkpoint" : "submission/ray_results/1v1/PPO_MultiGrid-CompetativeRedBlueDoor-v3-DTDE-1v1_e872e_00000_0_2023-09-25_17-17-18/checkpoint_000220",
+    "default_DTDE_1v1_opponent_checkpoint" : "/Users/zla0368/Documents/RL/RL_Class/code/test_hw/week-3-intro-to-marl-heng4str/submission/ray_results/Self_Play_Testing/PPO_MultiGrid-CompetativeRedBlueDoor-v3-DTDE-1v1_eb020_00000_0_2023-09-26_11-46-55/checkpoint_000250",
     "default_CTCE_2v2_opponent_checkpoint" : "submission/pretrained_checkpoints/CTCE_2v2/PPO_MultiGrid-CompetativeRedBlueDoor-v3-CTCE-2v2_a9680_00000_0_2023-09-24_02-36-15/checkpoint_000130"
 
    
