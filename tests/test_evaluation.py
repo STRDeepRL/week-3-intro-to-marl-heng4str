@@ -36,10 +36,9 @@ EVALUATION_CONFIG_FILE = sorted(
 )[-1]
 
 with open(EVALUATION_CONFIG_FILE, "r") as file:
-   evaluation_config_data = file.read()
+    evaluation_config_data = file.read()
 
 evaluation_config = json.loads(evaluation_config_data)
-
 
 
 def commit_and_push():
@@ -86,15 +85,15 @@ def test_evaluation():
         if "2v2" in scenario_name:
             policies_to_eval = ["red"]
             evaluation_config["team_policies_mapping"] = {
-                                "red": "your_policy_name",
-                            }
+                "red": "your_policy_name",
+            }
 
         elif "CTDE-Red" in scenario_name:
             policies_to_eval = ["red_0", "red_1"]
             evaluation_config["team_policies_mapping"] = {
-                    "red_0": "your_policy_name",
-                    "red_1": "your_policy_name_v2",
-                }
+                "red_0": "your_policy_name",
+                "red_1": "your_policy_name_v2",
+            }
 
         # Set argument
         params = {
@@ -109,7 +108,7 @@ def test_evaluation():
             "render_mode": "rgb_array",
             "save_dir": SAVE_DIR,
             "policies_to_eval": policies_to_eval,
-            "eval_config" : evaluation_config,
+            "eval_config": evaluation_config,
         }
 
         args = argparse.Namespace(**params)
@@ -142,13 +141,10 @@ def test_batch_evaluation():
         for checkpoint_dir in checkpoint_dirs
     ]
 
-
-    agent_policy_ids = [ policy_id for policy_id in SubmissionPolicies]
-
+    agent_policy_ids = [policy_id for policy_id in SubmissionPolicies]
 
     # Generate all possible 1v1 matchups
     matchups = list(combinations(agent_policy_ids, 2))
-
 
     agent_policies_checkpoints = {}
     for checkpoint_path in checkpoint_paths:
@@ -156,8 +152,7 @@ def test_batch_evaluation():
         custom_policy_id = restored_policies["red_0"].config["env_config"]["team_policies_mapping"]["red_0"]
         agent_policies_checkpoints[custom_policy_id] = checkpoint_path
 
-        
-    # Now, matchups contains all the 1v1 competitions
+    # Matchups contains all the 1v1 competitions
     for match in matchups:
         policy1, policy2 = match
 
@@ -166,15 +161,13 @@ def test_batch_evaluation():
 
         # Define parameters for the test
         env = "MultiGrid-CompetativeRedBlueDoor-v3-DTDE-1v1"
-
         if evaluation_config["using_eval_scenarios"]:
-            env += "-Eval" 
+            env += "-Eval"
 
         scenario_name = env.split("-v3-")[1]
 
-        # In case of aysimatry problem
+        # Fair evaluation for learned asymmetry behavior
         for _ in range(2):
-
             gif = f"{scenario_name}_{policy1}_as_Red_VS_{policy2}_as_Blue"
 
             evaluation_config["team_policies_mapping"] = {}
@@ -183,7 +176,7 @@ def test_batch_evaluation():
             evaluation_config["default_DTDE_1v1_opponent_checkpoint"] = checkpoint_path_2
 
             policies_to_eval = ["red_0", "blue_0"]
-    
+
             # Set argument
             params = {
                 "algo": "PPO",
@@ -197,7 +190,7 @@ def test_batch_evaluation():
                 "render_mode": "rgb_array",
                 "save_dir": SAVE_DIR,
                 "policies_to_eval": policies_to_eval,
-                "eval_config" : evaluation_config,
+                "eval_config": evaluation_config,
             }
 
             args = argparse.Namespace(**params)
@@ -207,14 +200,10 @@ def test_batch_evaluation():
 
             # Check the generated evaluation reports
             eval_report_path = os.path.join(args.save_dir, f"{gif}_eval_summary.csv")
-            # assert os.path.exists(eval_report_path), f"Expected evaluation report {eval_report_path} doesn't exist!"
 
-            # Change Red-Blue aysimatry
+            # Change Red-Blue asymmetry
             policy1, policy2 = policy2, policy1
             checkpoint_path_1, checkpoint_path_2 = checkpoint_path_2, checkpoint_path_1
 
-
     # commit_and_push()
 
-
-test_batch_evaluation()
