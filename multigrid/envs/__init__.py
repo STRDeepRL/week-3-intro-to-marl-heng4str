@@ -358,6 +358,68 @@ CONFIGURATIONS = {
             "max_steps": 300,
         },
     ),
+    "MultiGrid-CompetativeRedBlueDoor-v3-DTDE-1v1-Death_Match": (
+        CompetativeRedBlueDoorEnvV3,
+        {
+            "size": 8,
+            "allow_agent_overlap": False,
+            "has_obsticle": True,
+            "death_match": True,
+            "teams": {"blue": 1, "red": 1},
+            "agents": 2,
+            "training_scheme": "DTDE",
+            "reward_schemes": {
+                "red_0": {
+                    "eliminated_opponent_sparse_reward": 0.5,
+                    "key_pickup_sparse_reward": 0.5,
+                    "ball_pickup_dense_reward": 0.5,
+                    "dense_reward_discount_factor": {"ball_carrying_discount_factor": 0.9},
+                    "invalid_pickup_dense_penalty": 0.001,
+                },
+                "blue_0": {
+                    "eliminated_opponent_sparse_reward": 0.5,
+                    "key_pickup_sparse_reward": 0.5,
+                    "ball_pickup_dense_reward": 0.5,
+                    "dense_reward_discount_factor": {"ball_carrying_discount_factor": 0.9},
+                    "invalid_pickup_dense_penalty": 0.001,
+                },
+            },
+            "randomization": False,
+            "deadlock_no_Key": True,
+            "max_steps": 300,
+        },
+    ),
+    "MultiGrid-CompetativeRedBlueDoor-v3-DTDE-1v1-Death_Match-Eval": (
+        CompetativeRedBlueDoorEnvV3,
+        {
+            "size": 8,
+            "allow_agent_overlap": False,
+            "has_obsticle": True,
+            "death_match": True,
+            "teams": {"blue": 1, "red": 1},
+            "agents": 2,
+            "training_scheme": "DTDE",
+            "reward_schemes": {
+                "red_0": {
+                    "eliminated_opponent_sparse_reward": 0.5,
+                    "key_pickup_sparse_reward": 0.5,
+                    "ball_pickup_dense_reward": 0.5,
+                    "dense_reward_discount_factor": {"ball_carrying_discount_factor": 0.9},
+                    "invalid_pickup_dense_penalty": 0.001,
+                },
+                "blue_0": {
+                    "eliminated_opponent_sparse_reward": 0.5,
+                    "key_pickup_sparse_reward": 0.5,
+                    "ball_pickup_dense_reward": 0.5,
+                    "dense_reward_discount_factor": {"ball_carrying_discount_factor": 0.9},
+                    "invalid_pickup_dense_penalty": 0.001,
+                },
+            },
+            "randomization": False,
+            "deadlock_no_Key": True,
+            "max_steps": 100,
+        },
+    ),
     "MultiGrid-CompetativeRedBlueDoor-v3-CTCE-1v1": (
         CompetativeRedBlueDoorEnvV3,
         {
@@ -471,7 +533,7 @@ CONFIGURATIONS = {
                 },
             },
             "randomization": True,
-            "max_steps": 500,
+            "max_steps": 300,
         },
     ),
     "MultiGrid-CompetativeRedBlueDoor-v3-DTDE-2v2": (

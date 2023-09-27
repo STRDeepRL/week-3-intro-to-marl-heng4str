@@ -138,6 +138,8 @@ def get_actions(
     states : dict[AgentID, Any]
         Updated states for each agent
     """
+
+
     actions = {}
     for agent_id in agent_ids:
         if states[agent_id]:
@@ -147,11 +149,6 @@ def get_actions(
                 policy_id=agent_id
             )
         else:
-            actions[agent_id] = evaluating_algorithms[agent_id].compute_single_action(
-                observations[agent_id],
-                policy_id=agent_id
-            )
-
             if agent_id in policies_to_eval :
                 actions[agent_id] = evaluating_algorithms[agent_id].compute_single_action(
                     observations[agent_id],
@@ -162,7 +159,6 @@ def get_actions(
                     observations[agent_id],
                     policy_id=policies_to_eval[0] # HW3 NOTE - Act as another main policy e.g. "red_0"
                 )
-
 
 
 
@@ -193,6 +189,9 @@ def evaluation(
     episodes_data = []
     # HW3 NOTE - Using the the env from the main policy
     main_policy = policies_to_eval[0]
+    main_team = main_policy.split("_")[0] if len(main_policy.split("_")[0]) > 1 else "red"
+    # Update policies_to_eval
+    policies_to_eval = [ policy for policy in policies_to_eval if  main_team in policy]
     env = evaluating_algorithms[main_policy].env_creator(evaluating_algorithms[main_policy].config.env_config)
 
     for episode in range(num_episodes):
@@ -261,7 +260,7 @@ def main_evaluation(args):
     args.env_config.update(render_mode=args.render_mode)
     team_policies_mapping = args.eval_config["team_policies_mapping"]
 
-    # HW3 TODO - Setup Policies
+    # HW3 NOTE - Setup Policies
     evaluating_policies = {}
     for policy_id in args.policies_to_eval:
         policy_name = team_policies_mapping[policy_id]
@@ -300,22 +299,22 @@ def main_evaluation(args):
 
     if checkpoint:
         from ray.rllib.policy.policy import Policy
-        print(f"Loading checkpoint from {checkpoint}")
-
+    
         for policy_id, evaluating_algo in evaluating_algorithms.items():
 
             if policy_id == main_policy:
+                print(f"Loading main checkpoint from {checkpoint}")
                 evaluating_algo.restore(checkpoint)
             else:
                 if "default_DTDE_1v1_opponent_checkpoint" in args.eval_config and "DTDE-1v1" in args.env:
                     # restored_policies = Policy.from_checkpoint(args.eval_config["default_DTDE_1v1_opponent_checkpoint"])
                     opponent_checkpoint_path = args.eval_config["default_DTDE_1v1_opponent_checkpoint"]
                     print(f"Loading opponent checkpoint from {opponent_checkpoint_path}")
-                    evaluating_algo.restore(args.eval_config["default_DTDE_1v1_opponent_checkpoint"])
+                    evaluating_algo.restore(opponent_checkpoint_path)
                 elif "default_CTCE_2v2_opponent_checkpoint" in args.eval_config and "CTCE-2v2" in args.env:
                     opponent_checkpoint_path = args.eval_config["default_CTCE_2v2_opponent_checkpoint"]
                     print(f"Loading opponent checkpoint from {opponent_checkpoint_path}")
-                    evaluating_algo.restore(args.eval_config["default_CTCE_2v2_opponent_checkpoint"])
+                    evaluating_algo.restore(opponent_checkpoint_path)
                 else:
                     evaluating_algo.restore(checkpoint)
                 
