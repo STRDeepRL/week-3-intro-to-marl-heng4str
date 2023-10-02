@@ -283,7 +283,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--restore-all-policies-from-checkpoint",
         type=bool,
-        default=True,
+        default=False,
         help="If we want to continue training from last checkpoint",
     )
     parser.add_argument(

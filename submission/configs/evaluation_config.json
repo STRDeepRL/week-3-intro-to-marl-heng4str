@@ -1,7 +1,7 @@
 {
     "team_policies_mapping": {
-        "red": "your_policy_name",
-        "blue": "your_policy_name"
+        "red_0": "your_policy_name",
+        "blue_0": "your_policy_name"
 
 
     },

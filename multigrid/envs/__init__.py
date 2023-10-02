@@ -354,7 +354,7 @@ CONFIGURATIONS = {
                     "invalid_pickup_dense_penalty": 0.001,
                 },
             },
-            "randomization": False,
+            "randomization": True,
             "max_steps": 300,
         },
     ),
@@ -417,7 +417,7 @@ CONFIGURATIONS = {
             },
             "randomization": False,
             "deadlock_no_Key": True,
-            "max_steps": 100,
+            "max_steps": 300,
         },
     ),
     "MultiGrid-CompetativeRedBlueDoor-v3-CTCE-1v1": (
