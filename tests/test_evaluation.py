@@ -232,3 +232,6 @@ def test_batch_evaluation():
                 checkpoint_path_1, checkpoint_path_2 = checkpoint_path_2, checkpoint_path_1
 
         # commit_and_push()
+
+
+test_batch_evaluation()

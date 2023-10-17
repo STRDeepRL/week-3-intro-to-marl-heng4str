@@ -250,7 +250,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--env",
         type=str,
-        default="MultiGrid-CompetativeRedBlueDoor-v3-DTDE-1v1",
+        default="MultiGrid-CompetativeRedBlueDoor-v3-CTDE-Red",
         help="MultiGrid environment to use.",  #  MultiGrid-CompetativeRedBlueDoor-v3-DTDE-1v1
     )
     parser.add_argument(
@@ -276,7 +276,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--load-dir",
         type=str,
-        default="/Users/zla0368/Documents/RL/RL_Class/code/test_hw/week-3-intro-to-marl-heng4str/submission/ray_results/Self_Play_Testing/PPO_MultiGrid-CompetativeRedBlueDoor-v3-DTDE-1v1_e872e_00000_0_2023-09-25_17-17-18/checkpoint_000220",
+        default=None,#"/Users/zla0368/Documents/RL/RL_Class/code/test_hw/week-3-intro-to-marl-heng4str/submission/ray_results/Self_Play_Testing/PPO_MultiGrid-CompetativeRedBlueDoor-v3-DTDE-1v1_e872e_00000_0_2023-09-25_17-17-18/checkpoint_000220",
         help="Checkpoint directory for loading pre-trained policies.",
     )
     parser.add_argument("--policies-to-load", nargs="+", type=str, default=None, help="List of agent ids to train")
@@ -295,16 +295,16 @@ if __name__ == "__main__":
     parser.add_argument(
         "--name",
         type=str,
-        default="Self_Play_Testing",
+        default="Training_Scheme_Comparison",
         help="Distinct name to track your experinemnt in save-dir",  # <my_experinemnt>
     )
     parser.add_argument(
         "--local-mode", type=bool, default=False, help="Boolean value to set to use local mode for debugging"
     )
     parser.add_argument(
-        "--training-scheme", type=str, default="DTDE", help="Can be either 'CTCE', 'DTDE' or 'CTDE', for both "
+        "--training-scheme", type=str, default="CTDE", help="Can be either 'CTCE', 'DTDE' or 'CTDE', for both "
     )
-    parser.add_argument("--using-self-play", type=bool, default=True, help="If we want to train with Policy Self-Play")
+    parser.add_argument("--using-self-play", type=bool, default=False, help="If we want to train with Policy Self-Play")
     parser.add_argument(
         "--win-rate-threshold",
         type=float,
